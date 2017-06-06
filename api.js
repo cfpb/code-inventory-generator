@@ -58,9 +58,10 @@ codeJson = (org, cb) => {
   };
   
   request(options, (err, res, body) => {
-    if (err) return console.log(error);
+    if (err) return console.error(error);
+    if (!body.data.organization) return cb("Invalid GitHub organization!");
     const inventory = handleResponse(body);
-    cb(inventory);
+    cb(null, inventory);
   });
   
 };

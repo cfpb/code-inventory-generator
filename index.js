@@ -10,7 +10,10 @@ const app = http.createServer((req, res) => {
     return res.end("Plz specify a GitHub org.");
   }
   res.setHeader("Content-Type", "application/json");
-  api(params.org, json => res.end(JSON.stringify(json)));
+  api(params.org, (err, json) => {
+    if (err) return res.end(err);
+    res.end(JSON.stringify(json))
+  });
 });
 
 app.listen(PORT, () =>
