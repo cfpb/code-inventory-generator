@@ -4,10 +4,10 @@ A web app for generating an [inventory](https://code.gov/#/policy-guide/docs/com
 
 Demo: https://code-json.now.sh/?org=cfpb
 
-## Usage
+## Installation
 
-1. Sign up for GitHub's [Early Access Program](https://developer.github.com/early-access/graphql/guides/accessing-graphql/) and generate an OAuth token.
-1. `cp .env.sample .env` and add your token.
+1. Generate a [GitHub personal access token](https://github.com/settings/tokens) with `public_repo` and `read:org` permissions.
+1. `cp .env.sample .env` and add your token. `source .env`
 1. `npm install`
 2. `npm start`
 3. Visit http://localhost:3000?org=cfpb.
