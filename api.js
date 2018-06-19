@@ -2,20 +2,28 @@ const request = require('request');
 const http = require('http');
 const url = require('url');
 
+const PORT = process.env.PORT || 3000;
+
 let inventory = {
-  name: "",
-  version: "1.0.1",
-  projects: []
+  version: "2.0.0",
+  agency: "CFPB",
+  measurementType: {
+    method: "projects"
+  },
+  releases: []
 };
 
-codeJson = (org, cb) => {
-  
-  inventory.name = org.toLowerCase();
-  
+codeJson = (params, cb) => {
+  let after = '';
+
+  if (params.after) {
+    after = ` after:"${params.after}"`
+  }
+
   const query = `query($username:String!) {
-    organization(login: $username) {
+    organization(login:$username) {
       name
-      repositories(first: 100) {
+      repositories(first:100 ${after}) {
         nodes {
           name
           description
@@ -24,7 +32,7 @@ codeJson = (org, cb) => {
           owner {
             login
           }
-          repositoryTopics(first: 100) {
+          repositoryTopics(first:3) {
             edges {
               node {
                 topic {
@@ -34,14 +42,18 @@ codeJson = (org, cb) => {
             }
           }
         }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
       }
     }
   }`;
-  
+
   const variables = `{
-    "username": "${inventory.name}"
+    "username": "${params.org}"
   }`;
-  
+
   const options = {
     method: 'POST',
     url: 'https://api.github.com/graphql',
@@ -56,41 +68,58 @@ codeJson = (org, cb) => {
     },
     json: true
   };
-  
+
   request(options, (err, res, body) => {
+    console.log('\npageInfo: ' + body.data.organization.repositories.pageInfo);
+    if (body.data.organization.repositories.pageInfo.hasNextPage) {
+      console.log(
+`There are more results. Open http://localhost:${PORT}?org=${params.org}\
+&after=${body.data.organization.repositories.pageInfo.endCursor} \
+to see the next page.`
+      );
+    }
     if (err) return console.error(error);
     if (!body.data.organization) return cb("Invalid GitHub organization!");
     const inventory = handleResponse(body);
     cb(null, inventory);
   });
-  
+
 };
 
 handleResponse = (body) => {
-  
-  let projects = body.data.organization.repositories.nodes;
-  inventory.projects = projects.map((project) => {
-    let tags = project.repositoryTopics.edges.map((edge) => {
+
+  let releases = body.data.organization.repositories.nodes;
+  inventory.releases = releases.map((release) => {
+    let tags = release.repositoryTopics.edges.map((edge) => {
       return edge.node.topic.name;
     });
-    tags.push(inventory.name);
+    tags.push(inventory.agency);
     tags.sort();
+    if (!release.description) {
+      release.description = ''
+    }
     return {
-      name: project.name,
-      description: project.description,
-      license: project.license,
-      openSourceProject: 1,
-      governmentWideReuseProject: 1,
+      name: release.name,
+      description: release.description,
+      repositoryURL: release.url,
+      permissions: {
+        licenses: [
+          {
+            name: "Public Domain"
+          }
+        ],
+        usageType: "openSource"
+      },
+      laborHours: -1,
       tags: tags,
       contact: {
-        email: `contact@${inventory.name}.gov`
+        email: "tech@consumerfinance.gov"
       },
-      repository: project.url
     }
   });
-  
+
   return inventory;
-  
+
 }
 
 module.exports = codeJson;
