@@ -9,8 +9,9 @@ Demo: https://code-json.now.sh/?org=cfpb
 1. Generate a [GitHub personal access token](https://github.com/settings/tokens) with `public_repo` and `read:org` permissions.
 1. `cp .env.sample .env` and add your token. `source .env`
 1. `npm install`
-2. `npm start`
-3. Visit http://localhost:3000?org=cfpb.
+1. `npm start`
+1. Visit http://localhost:3000?org=cfpb.
+1. If there are greater than 100 results, pass the query's `endCursor` as an `after` parameter in the url to get the next page of results, e.g. http://localhost:3000?org=cfpb&after=Y3Vyc29yOnYyOpHOA/2KeA==
 
 ## Deployment
 

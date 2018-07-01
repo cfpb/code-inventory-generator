@@ -70,7 +70,7 @@ codeJson = (params, cb) => {
   };
 
   request(options, (err, res, body) => {
-    console.log('\npageInfo: ' + body.data.organization.repositories.pageInfo);
+    console.log('\npageInfo: ', body.data.organization.repositories.pageInfo);
     if (body.data.organization.repositories.pageInfo.hasNextPage) {
       console.log(
 `There are more results. Open http://localhost:${PORT}?org=${params.org}\
