@@ -2,8 +2,6 @@
 
 A web app for generating an [inventory](https://code.gov/#/policy-guide/docs/compliance/inventory-code) of an organization's software projects.
 
-Demo: https://code-json.now.sh/?org=cfpb
-
 ## Installation
 
 1. Generate a [GitHub personal access token](https://github.com/settings/tokens) with `public_repo` and `read:org` permissions.
